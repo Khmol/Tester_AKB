@@ -1,6 +1,6 @@
 #coding: utf8
 
-LENGTH = 9           # нормальная длина принимаемого пакета
+LENGTH = 13          # нормальная длина принимаемого пакета
 CMD_POS = 1          # номер байта CMD в пакете
 NUM_CHNL_POS = 2     # номер байта num_chnl в пакете
 PARAM_POS = 3        # номер байта param в пакете
@@ -9,6 +9,8 @@ MINUTES_POS = 5      # номер байта minutes в пакете
 SECONDS_POS = 6      # номер байта seconds в пакете
 STATUS_RELE_1 = 7    # номер байта stat_r1 в пакете
 STATUS_RELE_2 = 8    # номер байта stat_r2 в пакете
+TIME_LEFT_1 = 9      # начальный номер TIME_LEFT_1 в пакете
+TIME_LEFT_2 = 11     # начальный номер TIME_LEFT_2 в пакете
 
 class Application(object):
 
@@ -22,7 +24,7 @@ class Application(object):
         param: data_in: {bytes}
         return: [cmd_rx, num_chnl, param, hours, minutes, seconds, stat_r1, stat_r2, err]:
         """
-        cmd_rx = num_chnl = param = hours = minutes = seconds = stat_r1 = stat_r2 = 0
+        cmd_rx = num_chnl = param = hours = minutes = seconds = stat_r1 = stat_r2 = time_left_1 = time_left_2 = 0
         if len(data_in) != LENGTH:
             err = True
         else:
@@ -36,7 +38,9 @@ class Application(object):
             seconds = int.from_bytes(data_in[SECONDS_POS:SECONDS_POS+1], byteorder='little') #преобразуем в int
             stat_r1 = int.from_bytes(data_in[STATUS_RELE_1:STATUS_RELE_1+1], byteorder='little') #преобразуем в int
             stat_r2 = int.from_bytes(data_in[STATUS_RELE_2:STATUS_RELE_2+1], byteorder='little') #преобразуем в int
-        return (cmd_rx, num_chnl, param, hours, minutes, seconds, stat_r1, stat_r2, err)
+            time_left_1 = int.from_bytes(data_in[TIME_LEFT_1:TIME_LEFT_1+2], byteorder='little') #преобразуем в int
+            time_left_2 = int.from_bytes(data_in[TIME_LEFT_2:TIME_LEFT_2+2], byteorder='little') #преобразуем в int
+        return (cmd_rx, num_chnl, param, hours, minutes, seconds, stat_r1, stat_r2, time_left_1, time_left_2, err)
 
 
     def Set_Frame_Color(self, color, num_chnl):

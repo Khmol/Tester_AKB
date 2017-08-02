@@ -30,7 +30,7 @@ class Tester_AKB(QtWidgets.QMainWindow):
         self.READ_BYTES = 100    #количество байт для чтения
         self.OK_ANSWER = bytearray('OK'.encode('latin-1')) #OK
         self.MAX_WAIT_BYTES = 200    #максимальное количество байт в буфере порта на прием
-        self.NUMBER_SCAN_PORTS = 20  #количество портов для сканирования
+        self.NUMBER_SCAN_PORTS = 30  #количество портов для сканирования
         self.SET = 1                #значения для парсинга пакета
         # инициализация интерфейса
         self.ui = Ui_Form_Tester_AKB()      #инициализация графического интерфейса
@@ -70,7 +70,8 @@ class Tester_AKB(QtWidgets.QMainWindow):
             if self.MODE == 'TEST':
                 self.event.Show_RX_DATA()
             #производим рассчет CRC16 для self.rs_send_pack без последних двух байт
-            cmd_rx, self.num_chnl, param, hours, minutes, seconds, stat_rele_1, stat_rele_2, err = self.app.Parsing_Rx_Pack(self.rs_receive_pack)
+            cmd_rx, self.num_chnl, param, hours, minutes, seconds, stat_rele_1, stat_rele_2, time_left_1, time_left_2, err = \
+                self.app.Parsing_Rx_Pack(self.rs_receive_pack)
             # проверка была ли ошибка длины в принятых данных
             if err == True:
                 return ['Error']
@@ -91,13 +92,19 @@ class Tester_AKB(QtWidgets.QMainWindow):
                     self.app.Set_Label_Text('t=%dч:%dмин:%2dс' % (hours, minutes, seconds) , self.num_chnl )
                 if stat_rele_1 == 1:
                     self.app.Set_Frame_Color('green', 21)
-                    self.app.Set_Label_Text('включено', 21)
+                    time_h = time_left_1//60
+                    time_min = time_left_1 - time_h*60
+                    time_str = 'осталось ' + str(time_h) + ' ч. ' + str(time_min) + ' мин.'
+                    self.app.Set_Label_Text( time_str , 21)
                 else:
                     self.app.Set_Frame_Color('red', 21)
                     self.app.Set_Label_Text('выключено', 21)
                 if stat_rele_2 == 1:
                     self.app.Set_Frame_Color('green', 22)
-                    self.app.Set_Label_Text('включено', 22)
+                    time_h = time_left_2//60
+                    time_min = time_left_2 - time_h*60
+                    time_str = 'осталось ' + str(time_h) + ' ч. ' + str(time_min) + ' мин.'
+                    self.app.Set_Label_Text( time_str , 22)
                 else:
                     self.app.Set_Frame_Color('red', 22)
                     self.app.Set_Label_Text('выключено', 22)
